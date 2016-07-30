@@ -11,6 +11,13 @@ class Pokemon extends ControllerBase {
     this.dao = new Model(db);
   }
 
+  findAll (cb) {
+  	this.dao.find({} , null, {sort: {id: 1}}, (err, entities) => {
+  	  if (err) return cb(err);
+  	  cb(null, entities);
+  	});
+  }
+
 }
 
 module.exports = Pokemon;

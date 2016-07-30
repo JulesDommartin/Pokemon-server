@@ -12,6 +12,19 @@ class Pokemon extends RouteBase {
     this.ctrl   = new Controller(db);
   }
 
+  getHandle(req, response) {
+    logger.info("GET " + req.originalUrl);
+    this.ctrl.findAll((err, docs) => {
+      if (err) {
+        logger.error(err);
+        return response.status(err.code || 500).send(err);
+      } else {
+        logger.info({"response" : "ok", "code" : 200});
+        return response.status(200).send(docs);
+      }
+    });
+  }
+
 }
 
 module.exports = Pokemon;
