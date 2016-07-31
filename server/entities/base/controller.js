@@ -70,13 +70,16 @@ class EntityBase {
     logger.debug("[" + this.name + ".baseController] afterInsert");
   }
 
-  insert(entity) {
+  insert(entity, cb) {
     this.beforeInsert(entity, (err, res) => {
+      if (err) cb(err, 400);
       logger.debug("[" + this.name + ".controller] insert");
       logger.debug(entity);
       var instance = new this.dao(entity);
       instance.save(instance, (err, doc) => {
+        if (err) cb(err, 400);
         this.afterInsert(doc);
+        cb(null, doc);
       });
     });
   }

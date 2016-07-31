@@ -8,8 +8,7 @@ const pokemon_equipe = new mongoose.Schema({
 });
 
 const fields = {
-  firstName: {type: String, required: true},
-  lastName: {type: String, required: true},
+  userId: {type: mongoose.Schema.Types.ObjectId, required: true},
   pseudo: {type: String, required: true},
   listePokemons: {type: [mongoose.Schema.Types.ObjectId], default: []},
   equipePokemons: {type: [pokemon_equipe], default: []}

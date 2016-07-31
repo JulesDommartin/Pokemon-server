@@ -9,6 +9,7 @@ const Q            = require('q');
 
 class RouteBase {
   constructor(db) {
+    this.db = db;
     this.router = express.Router();
     this.get();
     this.getOne();
@@ -76,14 +77,14 @@ class RouteBase {
 
   permissionMiddleware(req, response, next) {
     console.log(req.headers);
-    apiaccess.hasAccess(req.headers.authorization, (err, res) => {
+    apiaccess.hasAccess(req.headers.authorization, this.db,(err, res) => {
       if (err) {
         logger.error(err);
         return response.status(err.code || 500).send(err);
       }
-      if (res) req.role = 'admin';
-      else req.role = 'user';
-
+      if (res == "admin") req.role = 'admin';
+      else if (res == "user") req.role = 'user';
+      else return response.status(400).send("Not authenticated");
       next();
     });
   }
@@ -127,10 +128,14 @@ class RouteBase {
       this.parseEntities(req, (err, entities) => {
         if (err) response.status(400).send(err);
         entities.forEach((entity) => {
-          this.ctrl.insert(entity);
+          this.ctrl.insertUser(entity, (err, res) => {
+            if (err) response.status(res).send(err);
+            response.status(200).send(res);
+          });
         });
       });
     } else {
+      response.status(403).send("Access Forbidden");
       logger.info("Insufficient rights");
     }
   }
