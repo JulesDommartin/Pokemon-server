@@ -4,7 +4,6 @@ const express      = require('express');
 const mongoose     = require('mongoose');
 const _            = require('underscore');
 const logger       = require('../../logger');
-const apiaccess    = require('../../apiaccess');
 const Q            = require('q');
 
 class RouteBase {
@@ -76,17 +75,7 @@ class RouteBase {
   }
 
   permissionMiddleware(req, response, next) {
-    console.log(req.headers);
-    apiaccess.hasAccess(req.headers.authorization, this.db,(err, res) => {
-      if (err) {
-        logger.error(err);
-        return response.status(err.code || 500).send(err);
-      }
-      if (res == "admin") req.role = 'admin';
-      else if (res == "user") req.role = 'user';
-      else return response.status(400).send("Not authenticated");
-      next();
-    });
+    next();
   }
 
   putHandler(req ,response, next) {
@@ -126,13 +115,19 @@ class RouteBase {
     logger.info("POST " + req.originalUrl);
     if (req.role == 'admin') {
       this.parseEntities(req, (err, entities) => {
-        if (err) response.status(400).send(err);
-        entities.forEach((entity) => {
-          this.ctrl.insertUser(entity, (err, res) => {
-            if (err) response.status(res).send(err);
-            response.status(200).send(res);
+        if (err) return response.status(400).send(err);
+        else {
+          entities.forEach((entity) => {
+            this.ctrl.insertUser(entity, (err, res) => {
+              if (err) return response.status(err.code || 500).send(err);
+              logger.info({"response" : "ok", "code" : 200});
+              return response.status(200).send(res);
+            }, (err) => {
+              logger.error(err);
+              return response.status(err.code || 500).send(err);
+            });
           });
-        });
+        }
       });
     } else {
       response.status(403).send("Access Forbidden");

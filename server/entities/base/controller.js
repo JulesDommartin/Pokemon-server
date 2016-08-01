@@ -3,6 +3,7 @@
 const logger       = require("../../logger");
 const mongoose     = require('mongoose');
 const _            = require('underscore');
+const Q            = require('q');
 
 class EntityBase {
   constructor(name, db) {
@@ -30,6 +31,18 @@ class EntityBase {
       if (err) { return cb(err); }
       cb(null, docs);
     });
+  }
+
+  findPromise(params) {
+    let q = Q.defer();
+    logger.debug("[" + this.name + ".baseController] findPromise (params) :");
+    logger.debug(JSON.stringify(params));
+    //this.dao.find(params, null, {sort: {createdDate: -1}}, (err, docs) => {
+      this.dao.find(params, (err, docs) => {
+      if (err) { q.reject(err); }
+      else { q.resolve(docs); }
+    });
+    return q.promise;
   }
 
   deleteOne(id, cb) {
