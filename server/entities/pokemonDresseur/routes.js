@@ -21,7 +21,7 @@ class PokemonDresseur extends RouteBase {
   getMine (req, response) {
     if (req.role == "user" || req.role == "admin") {
       logger.info("GET " + req.originalUrl + " (id: " + req.userId + ")");
-      this.ctrl.find({_id:req.userId}, (err, pokemons) => {
+      this.ctrl.find({userId:req.userId}, (err, pokemons) => {
         if (err) {
           logger.error(err);
           response.status(500).send(err);

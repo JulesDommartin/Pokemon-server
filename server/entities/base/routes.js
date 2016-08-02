@@ -118,7 +118,7 @@ class RouteBase {
         if (err) return response.status(400).send(err);
         else {
           entities.forEach((entity) => {
-            this.ctrl.insertUser(entity, (err, res) => {
+            this.ctrl.insert(entity, (err, res) => {
               if (err) return response.status(err.code || 500).send(err);
               logger.info({"response" : "ok", "code" : 200});
               return response.status(200).send(res);
