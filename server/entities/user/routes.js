@@ -103,12 +103,13 @@ class User extends RouteBase {
     var promises = [];
     var user = {};
     promises.push(this.ctrl.findPromise({_id:req.userId}));
-    promises.push(this.dresseurCtrl.findPromise({_id: req.userId}));
+    promises.push(this.dresseurCtrl.findPromise({userId: req.userId}));
     Q.all(promises)
     .then((res) => {
       let user, dresseur;
+
       if (res[0].length >= 1) user      = _.clone(res[0][0].toObject()); else user      = {};
-      if (res[1].length >= 1) dresseur  = _.clone(res[0][0].toObject()); else dresseur  = {};
+      if (res[1].length >= 1) dresseur  = _.clone(res[1][0].toObject()); else dresseur  = {};
       let responseEntity = _.extend(user, _.omit(dresseur, ['_id', 'userId']));
 
       logger.info({"response" : "ok", "code" : 200});

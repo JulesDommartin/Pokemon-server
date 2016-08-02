@@ -17,11 +17,12 @@ module.exports = function(app, db) {
   app.use('/bower_components', express.static(path.join(__dirname, '/../../client/bower_components')));
   app.use('/', express.static(path.join(__dirname, '/../../client/client/app')));
 
-  // app.use((req, res, next) => {
-  //   res.setHeader("Access-Control-Allow-Origin", "*");
-  //   res.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  //   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  // });
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,, Authorization, Content-Length");
+    return next();
+  });
 
   app.use('/api', (req, res, next) => {
 		if (req.method == "OPTIONS") {
@@ -35,6 +36,7 @@ module.exports = function(app, db) {
   var auth = new Auth(db);
 
   app.all('/api/token', (req, response, next) => {
+    logger.info("POST : " + req.originalUrl);
     if (!req.body.pseudo) {
       return response.status(400).send({
         code: 400,
@@ -63,8 +65,8 @@ module.exports = function(app, db) {
               logger.error({"code":err.code || 500});
               return response.status(err.code || 500).send(err);
             } else if (!user) {
-              logger.error({code:400, message:"wrong password, please try again"});
-              return response.status(400).send({code:400, message:"wrong password, please try again"});
+              logger.error({code:400, message:"Wrong password, please try again"});
+              return response.status(400).send({code:400, message:"Wrong password, please try again"});
             } else {
               auth.getTokenByUserId(user._id, (err, token) => {
                 if (err) return response.status(500).send({code:500, message:"Can't get the token"});
@@ -98,7 +100,7 @@ module.exports = function(app, db) {
               message: "no key with this bearer"
             });
           }
-          req.userId = user._id;
+          req.userId = user.userId;
           req.role   = user.role;
           next();
         });

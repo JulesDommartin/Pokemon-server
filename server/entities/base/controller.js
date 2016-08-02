@@ -24,10 +24,9 @@ class EntityBase {
   }
 
   find(params, cb) {
-    logger.debug("[" + this.name + ".baseController] find (baseCtrl) params:");
-    logger.debug(params);
-    // this.dao.find(params, null, {sort: {createdDate: -1}}, (err, docs) => {
-      this.dao.find(params, null, {sort: {createdDate: -1}}, (err, docs) => {
+    logger.info("[" + this.name + ".baseController] find (baseCtrl) params:");
+    logger.info(params);
+      this.dao.find(params, null, (err, docs) => {
       if (err) { return cb(err); }
       cb(null, docs);
     });
@@ -35,9 +34,8 @@ class EntityBase {
 
   findPromise(params) {
     let q = Q.defer();
-    logger.debug("[" + this.name + ".baseController] findPromise (params) :");
-    logger.debug(JSON.stringify(params));
-    //this.dao.find(params, null, {sort: {createdDate: -1}}, (err, docs) => {
+    logger.info("[" + this.name + ".baseController] findPromise (params) :");
+    logger.info(JSON.stringify(params));
       this.dao.find(params, (err, docs) => {
       if (err) { q.reject(err); }
       else { q.resolve(docs); }
