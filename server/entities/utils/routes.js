@@ -8,6 +8,7 @@ class Utils {
   constructor(db) {
     this.router = require('express').Router();
     this.router.get('/pokemons', (req, res, next) => { this.getPokemonByNumber(req, res, next); } );
+    this.router.get('/moves', (req, res, next)    => { this.getMovesById(req, res, next); });
   }
 
   getPokemonByNumber(req, res, next) {
@@ -29,6 +30,28 @@ class Utils {
       });
     } else {
       res.status(500).send("Veuillez indiquer un numéro de pokémon");
+    }
+  }
+
+  getMovesById(req, res, next) {
+    if (req.query && req.query.id) {
+      request({
+        url: "http://pokeapi.co/api/v2/move/" + req.query.id + "/",
+        method: "GET",
+        headers: {
+          'content-type': 'json'
+        },
+        json: true
+      }, (err, res, body) => {
+        if (err) return res.status(err.code || 500).send(err);
+        if (body.data !== null && body.data !== undefined) {
+          res.status(200).send(body.data);
+        } else {
+          res.status(500).send(body);
+        }
+      });
+    } else {
+      res.status(400).send("Aucun id de move trouvé");
     }
   }
 
