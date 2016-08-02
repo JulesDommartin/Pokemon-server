@@ -59,7 +59,7 @@ class RouteBase {
 
   getOneHandler(req, response) {
     logger.info("GET " + req.originalUrl);
-    this.ctrl.findOne((err, doc) => {
+    this.ctrl.find({_id: req.params.id}, (err, doc) => {
       if (err) {
         logger.error(err);
         return response.status(err.code || 500).send(err);

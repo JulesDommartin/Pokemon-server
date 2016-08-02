@@ -34,15 +34,15 @@ class Utils {
   }
 
   getMovesById(req, res, next) {
-    if (req.query && req.query.id) {
+    if (req.query && req.query.number) {
       request({
-        url: "http://pokeapi.co/api/v2/move/" + req.query.id + "/",
+        url: "http://pokeapi.co/api/v2/move/" + req.query.number + "/",
         method: "GET",
         headers: {
           'content-type': 'json'
         },
         json: true
-      }, (err, res, body) => {
+      }, (err, _res, body) => {
         if (err) return res.status(err.code || 500).send(err);
         if (body.data !== null && body.data !== undefined) {
           res.status(200).send(body.data);

@@ -12,6 +12,7 @@ const fields = {
 	userId: {type: mongoose.Schema.Types.ObjectId, required: true},
 	level: {type: Number, min: 1, max: 100, required: true},
 	stats: {type: [stat], required: true},
+	moves: {type: [Number], required: true},
 	hp: {type: Number, required: true}
 };
 

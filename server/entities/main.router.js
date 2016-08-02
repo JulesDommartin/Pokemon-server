@@ -13,6 +13,7 @@ class Router {
 
     let AccessToken     = require('./accessToken/routes');
     let Dresseur        = require('./dresseur/routes');
+    let Move            = require('./move/routes');
     let Pokemon         = require('./pokemon/routes');
     let PokemonDresseur = require('./pokemonDresseur/routes');
     let User            = require('./user/routes');
@@ -20,6 +21,7 @@ class Router {
 
     let accessToken     = new AccessToken(db);
     let dresseur        = new Dresseur(db);
+    let move            = new Move(db);
     let pokemon         = new Pokemon(db);
     let pokemonDresseur = new PokemonDresseur(db);
     let user            = new User(db);
@@ -27,6 +29,7 @@ class Router {
 
     this.router.use('/accessToken', accessToken.router);
     this.router.use('/dresseurs', dresseur.router);
+    this.router.use('/moves', move.router);
     this.router.use('/pokemons', pokemon.router);
     this.router.use('/pokemonsdresseur', pokemonDresseur.router);
     this.router.use('/users', user.router);
