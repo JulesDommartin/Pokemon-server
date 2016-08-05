@@ -10,6 +10,7 @@ class RouteBase {
   constructor(db) {
     this.db = db;
     this.router = express.Router();
+    this.publicRouter = express.Router();
     this.get();
     this.getOne();
     this.put();
@@ -59,7 +60,7 @@ class RouteBase {
 
   getOneHandler(req, response) {
     logger.info("GET " + req.originalUrl);
-    this.ctrl.find({_id: req.params.id}, (err, doc) => {
+    this.ctrl.findOne({_id: req.params.id}, (err, doc) => {
       if (err) {
         logger.error(err);
         return response.status(err.code || 500).send(err);
@@ -80,6 +81,23 @@ class RouteBase {
 
   putHandler(req ,response, next) {
     logger.info("PUT - base router - put handler - " + req.originalUrl + " (id: " + req.params.id + ")");
+
+    this.ctrl.update(_.extend(req.body, {_id:req.params.id}), (err, entity) => {
+      if (err) {
+        logger.error(err);
+        return response.status(err.code || 500).send(err);
+      } else {
+        // returning the updated document to prevent read failure
+        this.ctrl.findById(req.params.id, (err, doc) => {
+          if (err) {
+            logger.error(err);
+            return response.status(err.code || 500).send(err);
+          }
+          return response.status(200).send(doc);
+        }); // ctrl.findById
+      }
+    }); // ctrl.update
+
   }
 
   deleteOne() {

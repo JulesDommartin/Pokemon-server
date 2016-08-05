@@ -7,6 +7,8 @@ const RouteBase       = require('../base/routes');
 const _               = require('underscore');
 const Q               = require('q');
 const DresseurCtrl    = require('../dresseur/controller');
+const PokemonDresseurCtrl = require('../pokemonDresseur/controller');
+
 
 class User extends RouteBase {
 
@@ -14,10 +16,36 @@ class User extends RouteBase {
     super(db);
     this.ctrl   = new Controller(db);
     this.dresseurCtrl = new DresseurCtrl(db);
+    this.pokemonDresseurCtrl = new PokemonDresseurCtrl(db);
   }
 
   post() {
-  	this.router.post('/', (req, response, next) => { req.role = "admin"; super.postHandler(req, response, next);          });
+    this.publicRouter.post('/', (req, response, next) => { this.postHandler(req, response, next);     });
+  }
+
+  postHandler (req, response, next) {
+    logger.info("POST " + req.originalUrl);
+    this.parseEntities(req, (err, entities) => {
+      if (err) {
+        response.status(400).send(err);
+        next();
+      }
+      else {
+        entities.forEach((entity) => {
+          delete entity.confirmPassword;
+          this.ctrl.insertUser(entity, (err, res) => {
+            if (err) {
+              response.status(err.code || 500).send(err);
+              next();
+            } else {
+              logger.info({"response" : "ok", "code" : 200});
+              response.status(200).send(res);
+              next();
+            }
+          });
+        });
+      }
+    });
   }
 
   getHandle(req, response) {
@@ -62,9 +90,31 @@ class User extends RouteBase {
     }
   }
 
+  getExistPseudo (req, response, next) {
+    logger.info("GET " + req.originalUrl + " - pseudo : " + req.params.pseudo);
+    console.log(req.params); 
+    if (req.params && req.params.pseudo) {
+      this.ctrl.find(req.params, (err, res) => {
+        if (err) {
+          logger.error(err);
+          return response.status(err.code || 500).send(err);
+        } else if (res.length == 1) {
+          return response.status(200).send({code:200, message: true});
+        } else {
+          return response.status(200).send({code:200, message: false});
+        }
+      });
+    } else {
+      response.status(400).send({code: 400, message: "No pseudo provided"});
+    }
+  }
+
   getOne () {
     this.router.get('/me', (req, response, next) => { this.getMe(req, response); });
     this.router.get('/:pseudo', (req, response, next) => { this.getOneHandler(req, response, next); });
+    this.publicRouter.get('/exist/:pseudo', (req, response, next) => {
+      this.getExistPseudo(req, response, next);
+    });
   }
 
   getExistantHandler (req, response, next) {
@@ -94,10 +144,6 @@ class User extends RouteBase {
     }
   }
 
-  getExistant () {
-    this.router.get('/exist/:pseudo', (req, response, next) => { req.role = "admin"; this.getExistantHandler(req, response, next); });
-  }
-
   getMe (req, response) {
     logger.info("GET " + req.originalUrl + " (id: " + req.userId + ")");
     var promises = [];
@@ -112,8 +158,34 @@ class User extends RouteBase {
       if (res[1].length >= 1) dresseur  = _.clone(res[1][0].toObject()); else dresseur  = {};
       let responseEntity = _.extend(user, _.omit(dresseur, ['_id', 'userId']));
 
-      logger.info({"response" : "ok", "code" : 200});
-      return response.status(200).send(responseEntity);
+      promises = [];
+
+      for (var i = 0; i < responseEntity.listePokemons.length; i++) {
+        promises.push(this.pokemonDresseurCtrl.findOnePromise({_id:responseEntity.listePokemons[i]}));
+      }
+
+      Q.all(promises)
+        .then((result) => {
+
+          responseEntity.listePokemons = [];
+
+          console.log(result);
+          console.log("ok");
+          console.log(result.length);
+          for (var i = 0; i < result.length; i++) {
+            console.log("wow");
+            responseEntity.listePokemons.push(_.clone(result[i].toObject()));  
+            console.log("toast");
+          }
+
+          logger.info({"response" : "ok", "code" : 200});
+          return response.status(200).send(responseEntity);
+
+        })
+        .catch((error) => {
+          logger.error(err);
+          return response.status(err.code || 500).send(err);
+        });
     })
     .catch((err) => {
       logger.error(err);

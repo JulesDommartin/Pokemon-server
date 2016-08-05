@@ -43,6 +43,26 @@ class EntityBase {
     return q.promise;
   }
 
+  findOnePromise(params) {
+    let q = Q.defer();
+    logger.info("[" + this.name + ".baseController] findPromise (params) :");
+    logger.info(JSON.stringify(params));
+      this.dao.findOne(params, (err, docs) => {
+      if (err) { q.reject(err); }
+      else { q.resolve(docs); }
+    });
+    return q.promise;
+  }
+
+  findOne(params, cb) {
+   logger.info("[" + this.name + ".baseController] findOne (baseCtrl) params:");
+   logger.info(params);
+     this.dao.findOne(params, null, (err, docs) => {
+     if (err) { return cb(err); }
+     cb(null, docs);
+   }); 
+  }
+
   deleteOne(id, cb) {
     logger.debug("[" + this.name + ".baseController] delete (baseCtrl), id: " + id);
     this.dao.findByIdAndRemove(id, cb); // executes
@@ -93,6 +113,30 @@ class EntityBase {
         cb(null, doc);
       });
     });
+  }
+
+  beforeUpdate(entity, cb) {
+    logger.debug("[" + this.name + ".baseController] beforeUpdate");
+    cb(null, entity);
+  }
+
+  update(entity, cb) {
+    this.beforeUpdate(entity, (err, res) => {
+      logger.debug("[" + this.name + ".baseController] update (baseCtrl), entity: ");
+      logger.debug(entity);
+      if (entity._id) {
+        this.dao.update({_id: entity._id}, entity, {multi:true}, (err, doc) => {
+          this.afterUpdate(doc);
+          cb(err, doc);
+        });
+      } else {
+        return cb({"code":500,"message":"no _id in the entity to update"});
+      }
+    });
+  }
+
+  afterUpdate(entity) {
+    logger.debug("[" + this.name + ".baseController] afterUpdate");
   }
 
   remove(params, cb) {

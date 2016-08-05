@@ -91,13 +91,13 @@ module.exports = function(app, db) {
             console.log("On y est");
             res.status(401).send({
               code: 401,
-              message: "wrong bearer key"
+              message: "Wrong bearer key"
             });
           }
           if (!user) {
             res.status(401).send({
               code: 401,
-              message: "no key with this bearer"
+              message: "No key with this bearer"
             });
           }
           req.userId = user.userId;
@@ -107,21 +107,28 @@ module.exports = function(app, db) {
       } else {
         res.status(401).send({
           code: 401,
-          message: 'not authenticated (malformed auth header)'
+          message: 'Not authenticated (malformed auth header)'
         });
       }
     } else {
       res.status(401).send({
         code: 401,
-        message: 'not authenticated (no authorization header)'
+        message: 'Not authenticated (no authorization header)'
       });
     }
   });
 
+  app.use('/public', (req, res, next) => {
+    next();
+  });
+
   const Main = require('./entities/main.router');
+  const Public = require('./entities/public.router');
 
   const main = new Main(mongoose);
+  const publicR = new Public(mongoose);
 
   app.use('/api', main.router);
+  app.use('/public', publicR.router);
 
 };

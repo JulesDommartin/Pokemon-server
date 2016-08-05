@@ -15,6 +15,7 @@ class PokemonDresseur extends RouteBase {
   }
 
   getOne () {
+    this.router.get('/find/:id', (req, response) => { super.getOneHandler(req, response); });
     this.router.get('/mine', (req, response, next) => { this.getMine(req, response); });
   }
 
@@ -33,6 +34,11 @@ class PokemonDresseur extends RouteBase {
     } else {
       response.status(401).send({code: 401, message: "You are not authenticated"});
     }
+  }
+
+  post() {
+    this.router.post('/', (req, response, next) => { this.permissionMiddleware(req, response, next); });
+    this.router.post('/', (req, response, next) => { req.role = "admin"; this.postHandler(req, response, next);          });
   }
 
 }
