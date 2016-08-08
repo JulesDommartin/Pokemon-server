@@ -158,34 +158,42 @@ class User extends RouteBase {
       if (res[1].length >= 1) dresseur  = _.clone(res[1][0].toObject()); else dresseur  = {};
       let responseEntity = _.extend(user, _.omit(dresseur, ['_id', 'userId']));
 
-      promises = [];
+      // promises = [];
 
-      for (var i = 0; i < responseEntity.listePokemons.length; i++) {
-        promises.push(this.pokemonDresseurCtrl.findOnePromise({_id:responseEntity.listePokemons[i]}));
-      }
+      // for (var i = 0; i < responseEntity.listePokemons.length; i++) {
+      //   promises.push(this.pokemonDresseurCtrl.findOnePromise({_id:responseEntity.listePokemons[i]}));
+      // }
 
-      Q.all(promises)
-        .then((result) => {
+      // Q.all(promises)
+      //   .then((result) => {
 
-          responseEntity.listePokemons = [];
+      //     responseEntity.listePokemons = [];
 
-          console.log(result);
-          console.log("ok");
-          console.log(result.length);
-          for (var i = 0; i < result.length; i++) {
-            console.log("wow");
-            responseEntity.listePokemons.push(_.clone(result[i].toObject()));  
-            console.log("toast");
-          }
+      //     for (var i = 0; i < result.length; i++) {
+      //       responseEntity.listePokemons.push(_.clone(result[i].toObject()));  
+      //     }
 
-          logger.info({"response" : "ok", "code" : 200});
-          return response.status(200).send(responseEntity);
+      //     logger.info({"response" : "ok", "code" : 200});
+      //     return response.status(200).send(responseEntity);
 
-        })
-        .catch((error) => {
+      //   })
+      //   .catch((error) => {
+      //     logger.error(err);
+      //     return response.status(err.code || 500).send(err);
+      //   });
+      
+      this.pokemonDresseurCtrl.find({userId: req.userId}, (err, res) => {
+        if (err) {
           logger.error(err);
           return response.status(err.code || 500).send(err);
-        });
+        }
+        else {
+          responseEntity.listePokemons = res;
+          logger.info({"response" : "ok", "code" : 200});
+          return response.status(200).send(responseEntity);
+        }
+      });
+
     })
     .catch((err) => {
       logger.error(err);

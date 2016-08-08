@@ -122,8 +122,8 @@ class EntityBase {
 
   update(entity, cb) {
     this.beforeUpdate(entity, (err, res) => {
-      logger.debug("[" + this.name + ".baseController] update (baseCtrl), entity: ");
-      logger.debug(entity);
+      logger.info("[" + this.name + ".baseController] update (baseCtrl), entity: ");
+      logger.info(entity);
       if (entity._id) {
         this.dao.update({_id: entity._id}, entity, {multi:true}, (err, doc) => {
           this.afterUpdate(doc);
