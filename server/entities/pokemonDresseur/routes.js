@@ -4,6 +4,7 @@ const express         = require('express');
 const Controller      = require('./controller');
 const logger          = require('../../logger');
 const RouteBase       = require('../base/routes');
+const DresseurCtrl    = require('../dresseur/controller');
 const _               = require('underscore');
 const Q               = require('q');
 
@@ -12,6 +13,7 @@ class PokemonDresseur extends RouteBase {
   constructor(db) {
     super(db);
     this.ctrl   = new Controller(db);
+    this.dresseurCtrl = new DresseurCtrl(db);
   }
 
   getOne () {

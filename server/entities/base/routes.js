@@ -101,27 +101,20 @@ class RouteBase {
   }
 
   deleteOne() {
-    this.router.delete('/:id', (req, response, next) => { this.getOneMiddleware(req, response, next);              });
     this.router.delete('/:id', (req, response, next) => { this.permissionMiddleware(req, response, next); });
     this.router.delete('/:id', (req, response, next) => { this.deleteOneHandler(req, response, next);              });
   }
 
   deleteOneHandler(req, response, next) {
     logger.info("DELETE " + req.originalUrl + "id: " + req.params.id + ")");
-
-    if (req.docs.active === false) {
-      logger.info({"code" : 200, "message" : "already deleted"});
-      return response.status(200).send({"code" : 200, "message" : "already deleted"});
-    } else {
-      this.ctrl.remove({_id:req.docs._id.toString(), active:false}, (err, res) => {
-        if (err) {
-          logger.error(err);
-          return response.status(err.code || 500).send(err);
-        }
-        logger.info({"response" : "ok", "code" : 200});
-        return response.status(200).send(res);
-      });
-    }
+      this.ctrl.remove({_id:req.params._id}, (err, res) => {
+      if (err) {
+        logger.error(err);
+        return response.status(err.code || 500).send(err);
+      }
+      logger.info({"response" : "ok", "code" : 200});
+      return response.status(200).send(res);
+    });
   }
 
   post() {

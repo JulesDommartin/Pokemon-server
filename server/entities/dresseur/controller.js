@@ -30,7 +30,7 @@ class Dresseur extends ControllerBase {
           cb(err, doc);
         });
       } else {
-        return cb({"code":500,"message":"no _id in the entity to update"});
+        return cb({"code":500,"message":"no pseudo in the entity to update"});
       }
     });
   }
