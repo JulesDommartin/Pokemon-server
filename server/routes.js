@@ -14,8 +14,9 @@ module.exports = function(app, db) {
   logger.info("- local environment -");
   logger.info("setting up static files");
 
-  app.use('/bower_components', express.static(path.join(__dirname, '/../../client/bower_components')));
-  app.use('/', express.static(path.join(__dirname, '/../../client/client/app')));
+  app.use('/bower_components',  express.static(path.join(__dirname, '/../../client/bower_components')));
+  app.use('/admin',             express.static(path.join(__dirname, '/../../admin/client/app')));
+  app.use('/',                  express.static(path.join(__dirname, '/../../client/client/app')));
 
   app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");

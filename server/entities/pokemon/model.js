@@ -5,6 +5,7 @@ const _            = require('underscore');
 
 const learnable_move = new mongoose.Schema({
   name: {type: String, required: true},
+  id: {type: Number},
   level_learned_at: {type: Number, required: true}
 });
 
@@ -28,7 +29,10 @@ const fields       = {
   base_experience: {type: Number, required: true},
   moves: [learnable_move],
   sprites: sprites_schema,
-  stats: [base_stat]
+  stats: [base_stat],
+  taux_capture: {type: Number, required: true},
+  curve_type: {type: String, required: true},
+  ev_app: {type: [Number], required: true}
 };
 
 const schema = new mongoose.Schema(fields);

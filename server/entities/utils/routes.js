@@ -9,6 +9,7 @@ class Utils {
     this.router = require('express').Router();
     this.router.get('/pokemons', (req, res, next) => { this.getPokemonByNumber(req, res, next); } );
     this.router.get('/moves', (req, res, next)    => { this.getMovesById(req, res, next); });
+    this.router.post('/url', (req, res, next) => { this.getUrl(req, res, next); })
   }
 
   getPokemonByNumber(req, res, next) {
@@ -52,6 +53,28 @@ class Utils {
       });
     } else {
       res.status(400).send("Aucun id de move trouvé");
+    }
+  }
+
+  getUrl(req, res, next) {
+    if (req.body && req.body.url) {
+      console.log(req.body.url);
+      request({
+        url : req.body.url,
+        method : "GET",
+        headers : {
+          'content-type' : 'text/html'
+        }
+      }, (err, _res, body) => {
+        if (err) return res.status(err.code || 500).send(err);
+        if (body !== null && body !== undefined) {
+          return res.status(200).send(body);
+        } else {
+          return res.status(500).send("No body");
+        }
+      }); 
+    } else {
+      return res.status(400).send("Aucune url passée en paramêtre");
     }
   }
 

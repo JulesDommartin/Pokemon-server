@@ -17,7 +17,9 @@ const fields = {
 	moves: {type: [Number], required: true},
 	hp_left: {type: Number, required: true},
 	ivs: {type: [stat], required: true},
-	evs: {type: [stat], required: true}
+	evs: {type: [stat], required: true},
+	current_xp: {type: Number, default: 0},
+	curve_type: {type: String, required: true}
 };
 
 const schema = new mongoose.Schema(fields);

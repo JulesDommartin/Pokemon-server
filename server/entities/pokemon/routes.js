@@ -25,6 +25,18 @@ class Pokemon extends RouteBase {
     });
   }
 
+  getOneHandler(req, response) {
+    logger.info("GET " + req.originalUrl);
+    this.ctrl.findOne({id: req.params.id}, (err, doc) => {
+      if (err) {
+        logger.error(err);
+        return response.status(err.code || 500).send(err);
+      } else {
+        return response.status(200).send(doc);
+      }
+    });
+  }
+
 }
 
 module.exports = Pokemon;
