@@ -140,8 +140,8 @@ class EntityBase {
   }
 
   remove(params, cb) {
-    logger.debug("[" + this.name + ".baseController] remove");
-    logger.debug(params);
+    logger.info("[" + this.name + ".baseController] remove");
+    logger.info(params);
     this.dao.remove(params, cb);
   }
 

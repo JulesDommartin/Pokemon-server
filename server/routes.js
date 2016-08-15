@@ -15,6 +15,8 @@ module.exports = function(app, db) {
   logger.info("setting up static files");
 
   app.use('/bower_components',  express.static(path.join(__dirname, '/../../client/bower_components')));
+  app.use('/assets',            express.static(path.join(__dirname, '/../../client/client/assets/')));
+  app.use('/assets',            express.static(path.join(__dirname, '/../../admin/client/assets')));
   app.use('/admin',             express.static(path.join(__dirname, '/../../admin/client/app')));
   app.use('/',                  express.static(path.join(__dirname, '/../../client/client/app')));
 

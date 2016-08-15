@@ -106,8 +106,8 @@ class RouteBase {
   }
 
   deleteOneHandler(req, response, next) {
-    logger.info("DELETE " + req.originalUrl + "id: " + req.params.id + ")");
-      this.ctrl.remove({_id:req.params._id}, (err, res) => {
+    logger.info("DELETE " + req.originalUrl + " id: " + req.params.id + ")");
+      this.ctrl.remove({_id:req.params.id}, (err, res) => {
       if (err) {
         logger.error(err);
         return response.status(err.code || 500).send(err);
